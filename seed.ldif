@@ -1,0 +1,170 @@
+# =============================================================
+# Organizational Units
+# =============================================================
+dn: ou=personas,dc=smartfense,dc=local
+objectClass: organizationalUnit
+ou: personas
+
+dn: ou=groups,dc=smartfense,dc=local
+objectClass: organizationalUnit
+ou: groups
+
+# =============================================================
+# Users - all use inetOrgPerson (matches default search filter)
+# =============================================================
+
+# --- Active users ---
+
+dn: uid=jperez,ou=personas,dc=smartfense,dc=local
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+uid: jperez
+cn: Juan Pérez
+givenName: Juan
+sn: Pérez
+displayName: Juan Pérez
+mail: juan.perez@smartfense.local
+ou: IT
+telephoneNumber: +54 11 1234-5678
+preferredLanguage: es
+
+dn: uid=mgarcia,ou=personas,dc=smartfense,dc=local
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+uid: mgarcia
+cn: María García
+givenName: María
+sn: García
+displayName: María García
+mail: maria.garcia@smartfense.local
+ou: RRHH
+telephoneNumber: +54 11 2345-6789
+preferredLanguage: es
+
+dn: uid=clopez,ou=personas,dc=smartfense,dc=local
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+uid: clopez
+cn: Carlos López
+givenName: Carlos
+sn: López
+displayName: Carlos López
+mail: carlos.lopez@smartfense.local
+ou: IT
+ou: Developers
+telephoneNumber: +54 11 3456-7890
+preferredLanguage: es
+
+dn: uid=asmith,ou=personas,dc=smartfense,dc=local
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+uid: asmith
+cn: Alice Smith
+givenName: Alice
+sn: Smith
+displayName: Alice Smith
+mail: alice.smith@smartfense.local
+ou: Management
+telephoneNumber: +1 555 0100
+preferredLanguage: en
+
+dn: uid=bmartinez,ou=personas,dc=smartfense,dc=local
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+uid: bmartinez
+cn: Bruno Martínez
+givenName: Bruno
+sn: Martínez
+displayName: Bruno Martínez
+mail: bruno.martinez@smartfense.local
+ou: Finance
+telephoneNumber: +54 11 4567-8901
+preferredLanguage: es
+
+dn: uid=lrodriguez,ou=personas,dc=smartfense,dc=local
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+uid: lrodriguez
+cn: Laura Rodríguez
+givenName: Laura
+sn: Rodríguez
+displayName: Laura Rodríguez
+mail: laura.rodriguez@smartfense.local
+ou: IT
+ou: Security
+telephoneNumber: +54 11 5678-9012
+preferredLanguage: es
+
+dn: uid=pfernandez,ou=personas,dc=smartfense,dc=local
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+uid: pfernandez
+cn: Pablo Fernández
+givenName: Pablo
+sn: Fernández
+displayName: Pablo Fernández
+mail: pablo.fernandez@smartfense.local
+ou: RRHH
+telephoneNumber: +54 11 6789-0123
+preferredLanguage: es
+
+dn: uid=rgomez,ou=personas,dc=smartfense,dc=local
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+uid: rgomez
+cn: Roberto Gómez
+givenName: Roberto
+sn: Gómez
+displayName: Roberto Gómez
+mail: roberto.gomez@smartfense.local
+ou: Management
+ou: IT
+telephoneNumber: +54 11 7890-1234
+preferredLanguage: es
+
+# --- Inactive user (nsAccountLock = TRUE) ---
+
+dn: uid=dsilva,ou=personas,dc=smartfense,dc=local
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+uid: dsilva
+cn: Diego Silva
+givenName: Diego
+sn: Silva
+displayName: Diego Silva
+mail: diego.silva@smartfense.local
+ou: IT
+telephoneNumber: +54 11 8901-2345
+preferredLanguage: es
+description: DISABLED
+
+# --- User without email (should be skipped by the integration) ---
+
+dn: uid=serviceaccount,ou=personas,dc=smartfense,dc=local
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+uid: serviceaccount
+cn: Service Account
+givenName: Service
+sn: Account
+displayName: Service Account
