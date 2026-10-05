@@ -1,0 +1,16 @@
+{$LDAP_HOST} {
+	tls {$CADDY_TLS}
+	basic_auth {
+		{$WEB_USER} {$WEB_PASSWORD_HASH}
+	}
+	root * /srv
+	file_server
+}
+
+{$LAM_HOST} {
+	tls {$CADDY_TLS}
+	basic_auth {
+		{$WEB_USER} {$WEB_PASSWORD_HASH}
+	}
+	reverse_proxy lam:80
+}

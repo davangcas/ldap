@@ -1,34 +1,118 @@
-version: "3.8"
+# LDAP de prueba para QA, publicado en internet.
+#
+# Un OpenLDAP por escenario de certificado, todos con el mismo seed, para que QA
+# pruebe cada caso sin tocar el servidor. El de "valid" es el principal: es el
+# que administra LAM y el único que atiende LDAP sin cifrar en el 389.
+#
+# Caddy publica por HTTPS la página con los datos de conexión y la interfaz de LAM.
+
+x-ldap: &ldap
+  image: osixia/openldap:1.5.0
+  restart: unless-stopped
+  command: --copy-service
+  environment: &ldap-env
+    LDAP_ORGANISATION: "SMARTFENSE Test"
+    LDAP_DOMAIN: "smartfense.local"
+    LDAP_ADMIN_PASSWORD: "${LDAP_ADMIN_PASSWORD}"
+    LDAP_CONFIG_PASSWORD: "${LDAP_CONFIG_PASSWORD}"
+    LDAP_READONLY_USER: "true"
+    LDAP_READONLY_USER_USERNAME: "readonly"
+    LDAP_READONLY_USER_PASSWORD: "${LDAP_READONLY_PASSWORD}"
+    LDAP_TLS: "true"
+    LDAP_TLS_CRT_FILENAME: "server.crt"
+    LDAP_TLS_KEY_FILENAME: "server.key"
+    LDAP_TLS_CA_CRT_FILENAME: "ca.crt"
+    LDAP_TLS_DH_PARAM_FILENAME: "dhparam.pem"
+    LDAP_TLS_VERIFY_CLIENT: "never"
+    LDAP_TLS_ENFORCE: "false"
 
 services:
-  openldap:
-    image: osixia/openldap:1.5.0
-    container_name: smartfense-ldap
-    environment:
-      LDAP_ORGANISATION: "${LDAP_ORGANISATION}"
-      LDAP_DOMAIN: "${LDAP_DOMAIN}"
-      LDAP_ADMIN_PASSWORD: "${LDAP_ADMIN_PASSWORD}"
-      LDAP_CONFIG_PASSWORD: "${LDAP_CONFIG_PASSWORD}"
-      LDAP_READONLY_USER: "${LDAP_READONLY_USER}"
-      LDAP_READONLY_USER_USERNAME: "${LDAP_READONLY_USER_USERNAME}"
-      LDAP_READONLY_USER_PASSWORD: "${LDAP_READONLY_USER_PASSWORD}"
+  ldap:
+    <<: *ldap
+    hostname: ldap
     ports:
-      - "127.0.0.1:${LDAP_PORT}:389"
+      - "389:389"
+      - "636:636"
     volumes:
-      - ./seed.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/50-seed.ldif
-    command: --copy-service
+      - ./seed.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/50-seed.ldif:ro
+      - ./data/certs/valid:/container/service/slapd/assets/certs:ro
+
+  ldap-chain:
+    <<: *ldap
+    ports:
+      - "1389:389"
+      - "1636:636"
+    volumes:
+      - ./seed.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/50-seed.ldif:ro
+      - ./data/certs/chain:/container/service/slapd/assets/certs:ro
+
+  ldap-chain-no-intermediate:
+    <<: *ldap
+    ports:
+      - "2389:389"
+      - "2636:636"
+    volumes:
+      - ./seed.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/50-seed.ldif:ro
+      - ./data/certs/chain-no-intermediate:/container/service/slapd/assets/certs:ro
+
+  ldap-self-signed:
+    <<: *ldap
+    ports:
+      - "3389:389"
+      - "3636:636"
+    volumes:
+      - ./seed.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/50-seed.ldif:ro
+      - ./data/certs/self-signed:/container/service/slapd/assets/certs:ro
+
+  ldap-self-signed-leaf:
+    <<: *ldap
+    ports:
+      - "4389:389"
+      - "4636:636"
+    volumes:
+      - ./seed.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/50-seed.ldif:ro
+      - ./data/certs/self-signed-leaf:/container/service/slapd/assets/certs:ro
+
+  ldap-expired:
+    <<: *ldap
+    ports:
+      - "5389:389"
+      - "5636:636"
+    volumes:
+      - ./seed.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/50-seed.ldif:ro
+      - ./data/certs/expired:/container/service/slapd/assets/certs:ro
 
   lam:
-    image: ghcr.io/ldapaccountmanager/lam:stable
-    container_name: smartfense-ldap-admin
+    image: ghcr.io/ldapaccountmanager/lam:9.6
+    restart: unless-stopped
     environment:
-      LDAP_DOMAIN: "${LDAP_DOMAIN}"
-      LDAP_BASE_DN: "${LDAP_BASE_DN}"
-      LDAP_SERVER: "ldap://openldap:389"
-      LDAP_USER: "cn=admin,${LDAP_BASE_DN}"
+      LDAP_DOMAIN: "smartfense.local"
+      LDAP_BASE_DN: "dc=smartfense,dc=local"
+      LDAP_SERVER: "ldap://ldap:389"
+      LDAP_USER: "cn=admin,dc=smartfense,dc=local"
       LAM_PASSWORD: "${LAM_PASSWORD}"
-      LAM_LANG: "${LAM_LANG}"
-    ports:
-      - "127.0.0.1:${LAM_PORT:-8040}:80"
+      LAM_LANG: "es_ES"
     depends_on:
-      - openldap
+      - ldap
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      LDAP_HOST: "${LDAP_HOST}"
+      LAM_HOST: "${LAM_HOST}"
+      CADDY_TLS: "${CADDY_TLS}"
+      WEB_USER: "${WEB_USER}"
+      WEB_PASSWORD_HASH: "${WEB_PASSWORD_HASH}"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./data/site:/srv:ro
+      - caddy_data:/data
+    depends_on:
+      - lam
+
+volumes:
+  caddy_data:

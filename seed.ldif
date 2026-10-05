@@ -1,19 +1,40 @@
-# =============================================================
-# Organizational Units
-# =============================================================
+# Directory of the local LDAP test server, loaded when the container starts.
+#
+# ou=personas is the branch the platform synchronizes (Base DN). ou=direccion
+# lives outside it on purpose: its people are the managers of others, so the
+# sync has to look them up in the directory instead of finding them in the run.
+# ou=externos is also outside the Base DN and must never be imported.
+
 dn: ou=personas,dc=smartfense,dc=local
 objectClass: organizationalUnit
 ou: personas
 
-dn: ou=groups,dc=smartfense,dc=local
+dn: ou=direccion,dc=smartfense,dc=local
 objectClass: organizationalUnit
-ou: groups
+ou: direccion
 
-# =============================================================
-# Users - all use inetOrgPerson (matches default search filter)
-# =============================================================
+dn: ou=externos,dc=smartfense,dc=local
+objectClass: organizationalUnit
+ou: externos
 
-# --- Active users ---
+# Manager outside the Base DN: reached by a directory lookup.
+dn: uid=ceo,ou=direccion,dc=smartfense,dc=local
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+uid: ceo
+cn: Carolina Directora
+givenName: Carolina
+sn: Directora
+displayName: Carolina Directora
+mail: carolina.directora@smartfense.local
+ou: Management
+telephoneNumber: +54 11 1000-0000
+preferredLanguage: es
+employeeNumber: 0001
+departmentNumber: Dirección
+title: Directora general
 
 dn: uid=jperez,ou=personas,dc=smartfense,dc=local
 objectClass: inetOrgPerson
@@ -29,6 +50,10 @@ mail: juan.perez@smartfense.local
 ou: IT
 telephoneNumber: +54 11 1234-5678
 preferredLanguage: es
+employeeNumber: 1001
+departmentNumber: Tecnología
+title: Analista
+manager: uid=rgomez,ou=personas,dc=smartfense,dc=local
 
 dn: uid=mgarcia,ou=personas,dc=smartfense,dc=local
 objectClass: inetOrgPerson
@@ -44,6 +69,10 @@ mail: maria.garcia@smartfense.local
 ou: RRHH
 telephoneNumber: +54 11 2345-6789
 preferredLanguage: es
+employeeNumber: 1002
+departmentNumber: Recursos Humanos
+title: Analista
+manager: uid=asmith,ou=personas,dc=smartfense,dc=local
 
 dn: uid=clopez,ou=personas,dc=smartfense,dc=local
 objectClass: inetOrgPerson
@@ -60,6 +89,10 @@ ou: IT
 ou: Developers
 telephoneNumber: +54 11 3456-7890
 preferredLanguage: es
+employeeNumber: 1003
+departmentNumber: Tecnología
+title: Desarrollador
+manager: uid=rgomez,ou=personas,dc=smartfense,dc=local
 
 dn: uid=asmith,ou=personas,dc=smartfense,dc=local
 objectClass: inetOrgPerson
@@ -75,7 +108,12 @@ mail: alice.smith@smartfense.local
 ou: Management
 telephoneNumber: +1 555 0100
 preferredLanguage: en
+employeeNumber: 1004
+departmentNumber: Dirección
+title: Gerente
+manager: uid=ceo,ou=direccion,dc=smartfense,dc=local
 
+# Manager that does not exist in the directory: the user stays without manager.
 dn: uid=bmartinez,ou=personas,dc=smartfense,dc=local
 objectClass: inetOrgPerson
 objectClass: organizationalPerson
@@ -90,6 +128,10 @@ mail: bruno.martinez@smartfense.local
 ou: Finance
 telephoneNumber: +54 11 4567-8901
 preferredLanguage: es
+employeeNumber: 1005
+departmentNumber: Finanzas
+title: Analista
+manager: uid=noexiste,ou=personas,dc=smartfense,dc=local
 
 dn: uid=lrodriguez,ou=personas,dc=smartfense,dc=local
 objectClass: inetOrgPerson
@@ -106,6 +148,10 @@ ou: IT
 ou: Security
 telephoneNumber: +54 11 5678-9012
 preferredLanguage: es
+employeeNumber: 1006
+departmentNumber: Tecnología
+title: Especialista en seguridad
+manager: uid=rgomez,ou=personas,dc=smartfense,dc=local
 
 dn: uid=pfernandez,ou=personas,dc=smartfense,dc=local
 objectClass: inetOrgPerson
@@ -121,6 +167,10 @@ mail: pablo.fernandez@smartfense.local
 ou: RRHH
 telephoneNumber: +54 11 6789-0123
 preferredLanguage: es
+employeeNumber: 1007
+departmentNumber: Recursos Humanos
+title: Analista
+manager: uid=asmith,ou=personas,dc=smartfense,dc=local
 
 dn: uid=rgomez,ou=personas,dc=smartfense,dc=local
 objectClass: inetOrgPerson
@@ -137,9 +187,32 @@ ou: Management
 ou: IT
 telephoneNumber: +54 11 7890-1234
 preferredLanguage: es
+employeeNumber: 1008
+departmentNumber: Tecnología
+title: Gerente
+manager: uid=ceo,ou=direccion,dc=smartfense,dc=local
 
-# --- Inactive user (nsAccountLock = TRUE) ---
+# Portuguese speaker, to check the language mapping.
+dn: uid=aoliveira,ou=personas,dc=smartfense,dc=local
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+uid: aoliveira
+cn: Ana Oliveira
+givenName: Ana
+sn: Oliveira
+displayName: Ana Oliveira
+mail: ana.oliveira@smartfense.local
+ou: Finance
+telephoneNumber: +55 11 9876-5432
+preferredLanguage: pt
+employeeNumber: 1009
+departmentNumber: Finanzas
+title: Analista
+manager: uid=asmith,ou=personas,dc=smartfense,dc=local
 
+# Inactive: map the status attribute to description and the inactive value to DISABLED.
 dn: uid=dsilva,ou=personas,dc=smartfense,dc=local
 objectClass: inetOrgPerson
 objectClass: organizationalPerson
@@ -154,10 +227,27 @@ mail: diego.silva@smartfense.local
 ou: IT
 telephoneNumber: +54 11 8901-2345
 preferredLanguage: es
+employeeNumber: 1010
+departmentNumber: Tecnología
+title: Analista
+manager: uid=rgomez,ou=personas,dc=smartfense,dc=local
 description: DISABLED
 
-# --- User without email (should be skipped by the integration) ---
+# Invalid email: skipped by the sync.
+dn: uid=mbad,ou=personas,dc=smartfense,dc=local
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+uid: mbad
+cn: Mail Inválido
+givenName: Mail
+sn: Inválido
+displayName: Mail Inválido
+mail: esto-no-es-un-mail
+ou: IT
 
+# No email at all: skipped by the sync.
 dn: uid=serviceaccount,ou=personas,dc=smartfense,dc=local
 objectClass: inetOrgPerson
 objectClass: organizationalPerson
@@ -168,3 +258,18 @@ cn: Service Account
 givenName: Service
 sn: Account
 displayName: Service Account
+
+# Outside the Base DN: never imported.
+dn: uid=proveedor,ou=externos,dc=smartfense,dc=local
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+uid: proveedor
+cn: Pedro Proveedor
+givenName: Pedro
+sn: Proveedor
+displayName: Pedro Proveedor
+mail: pedro.proveedor@smartfense.local
+ou: Externos
+preferredLanguage: es
