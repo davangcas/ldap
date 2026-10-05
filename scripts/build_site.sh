@@ -7,7 +7,7 @@
 set -eu
 
 cd "$(dirname "$0")/.."
-: "${LDAP_HOST:?}" "${LDAP_ALT_HOST:?}" "${LAM_HOST:?}" "${LDAP_READONLY_PASSWORD:?}"
+: "${LDAP_HOST:?}" "${LDAP_ALT_HOST:?}" "${LDAP_READONLY_PASSWORD:?}"
 
 C=data/certs
 S=data/site
@@ -128,7 +128,7 @@ cat <<HTML
 
 <h2>Usuarios del directorio</h2>
 <p>En <code>ou=personas</code>, que es el Base DN, hay 12 entradas: 9 personas activas con área, nivel y manager (<code>bmartinez</code> tiene un manager que no existe), una inactiva (<code>dsilva</code>, <code>description: DISABLED</code>), una con mail inválido (<code>mbad</code>) y una sin mail (<code>serviceaccount</code>). Fuera del Base DN: la directora (<code>ou=direccion</code>, manager de los gerentes) y un proveedor (<code>ou=externos</code>).</p>
-<p>Para crear o editar usuarios: <a href="https://${LAM_HOST}/">LDAP Account Manager</a>, usuario <code>admin</code> (contraseña: la de administrador del directorio, la tiene quien administra el VPS). Lo que se edite ahí impacta solo en el servidor del escenario válido (puertos 389 y 636).</p>
+<p>Para crear o editar usuarios: <a href="/">LDAP Account Manager</a>, usuario <code>admin</code> (contraseña: la de administrador del directorio, la tiene quien administra el VPS). Lo que se edite ahí impacta solo en el servidor del escenario válido (puertos 389 y 636).</p>
 </main>
 <script>
 document.querySelectorAll("button[data-copy]").forEach(function (button) {

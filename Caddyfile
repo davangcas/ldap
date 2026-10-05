@@ -6,13 +6,14 @@
 	basic_auth {
 		{$WEB_USER} {$WEB_PASSWORD_HASH}
 	}
-	root * /srv
-	file_server
-}
 
-:8081 {
-	basic_auth {
-		{$WEB_USER} {$WEB_PASSWORD_HASH}
+	redir /info /info/
+	handle_path /info/* {
+		root * /srv
+		file_server
 	}
-	reverse_proxy lam:80
+
+	handle {
+		reverse_proxy lam:80
+	}
 }
