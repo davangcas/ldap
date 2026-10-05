@@ -4,7 +4,8 @@
 # pruebe cada caso sin tocar el servidor. El de "valid" es el principal: es el
 # que administra LAM y el único que atiende LDAP sin cifrar en el 389.
 #
-# Caddy publica por HTTPS la página con los datos de conexión y la interfaz de LAM.
+# La página con los datos de conexión y LAM quedan en puertos locales; el nginx del
+# servidor les da HTTPS y los publica.
 
 x-ldap: &ldap
   image: osixia/openldap:1.5.0
@@ -95,16 +96,15 @@ services:
     depends_on:
       - ldap
 
+  # Página de info y LAM, solo en la interfaz local y con autenticación básica.
+  # El nginx del servidor les da HTTPS y los publica.
   caddy:
     image: caddy:2
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - "127.0.0.1:${INFO_PORT:-8041}:8080"
+      - "127.0.0.1:${LAM_PORT:-8040}:8081"
     environment:
-      LDAP_HOST: "${LDAP_HOST}"
-      LAM_HOST: "${LAM_HOST}"
-      CADDY_TLS: "${CADDY_TLS}"
       WEB_USER: "${WEB_USER}"
       WEB_PASSWORD_HASH: "${WEB_PASSWORD_HASH}"
     volumes:

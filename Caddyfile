@@ -1,5 +1,8 @@
-{$LDAP_HOST} {
-	tls {$CADDY_TLS}
+{
+	auto_https off
+}
+
+:8080 {
 	basic_auth {
 		{$WEB_USER} {$WEB_PASSWORD_HASH}
 	}
@@ -7,8 +10,7 @@
 	file_server
 }
 
-{$LAM_HOST} {
-	tls {$CADDY_TLS}
+:8081 {
 	basic_auth {
 		{$WEB_USER} {$WEB_PASSWORD_HASH}
 	}

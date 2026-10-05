@@ -34,7 +34,7 @@ docker compose up -d --force-recreate
 cat <<INFO
 
 LDAP de QA levantado.
-  Página de info : https://${LDAP_HOST}/
-  LAM            : https://${LAM_HOST}/
+  Página de info : 127.0.0.1:${INFO_PORT:-8041}  (publicar como https://${LDAP_HOST}/)
+  LAM            : 127.0.0.1:${LAM_PORT:-8040}  (publicar como https://${LAM_HOST}/)
   Usuario web    : ${WEB_USER}
 INFO
